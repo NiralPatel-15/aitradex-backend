@@ -1,45 +1,37 @@
-// src/routes/ai.routes.js
-
 const express = require("express");
 
+const { chatWithAi } = require("../controllers/ai.controller");
+
+const firebaseAuthMiddleware = require("../middleware/firebaseAuth.middleware");
+
 const {
-  chatWithAi,
-} = require("../controllers/ai.controller");
-
-const firebaseAuthMiddleware = require(
-  "../middleware/firebaseAuth.middleware"
-);
-
-// ==========================================================
-// AI ROUTER
-// ==========================================================
+  getDisclaimerStatus,
+  acceptDisclaimer,
+  requireCurrentDisclaimerAcceptance,
+} = require("../controllers/aiDisclaimer.controller");
 
 const router = express.Router();
 
-// ==========================================================
-// POST /api/ai/chat
-//
-// Authentication:
-// Firebase ID Token required
-//
-// Header:
-// Authorization: Bearer <firebase-id-token>
-//
-// Body:
-// {
-//   "message": "What is an ETF?",
-//   "history": []
-// }
-// ==========================================================
+// Get the current disclaimer and this user's acceptance status.
+router.get(
+  "/disclaimer/status",
+  firebaseAuthMiddleware,
+  getDisclaimerStatus,
+);
 
+// Save acceptance of the current disclaimer version.
+router.post(
+  "/disclaimer/accept",
+  firebaseAuthMiddleware,
+  acceptDisclaimer,
+);
+
+// AI chat is available only after acceptance.
 router.post(
   "/chat",
   firebaseAuthMiddleware,
-  chatWithAi
+  requireCurrentDisclaimerAcceptance,
+  chatWithAi,
 );
-
-// ==========================================================
-// EXPORT ROUTER
-// ==========================================================
 
 module.exports = router;

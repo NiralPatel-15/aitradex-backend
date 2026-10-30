@@ -1,3 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment variables and secrets
 .env
 .env.*
-node_modules/
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db

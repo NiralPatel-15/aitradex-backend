@@ -4,12 +4,21 @@ const connectDB = async () => {
   try {
     mongoose.set("strictQuery", true);
 
+    if (!process.env.MONGODB_URI) {
+      throw new Error("MONGODB_URI is missing from environment variables.");
+    }
+
+    // Both Flutter and the website should use the same backend
+    // and the same MongoDB database.
+    const dbName = process.env.MONGODB_DB_NAME || "aitradex";
+
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      dbName,
       autoIndex: true,
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
-       family: 4,
+      family: 4,
     });
 
     console.log("\n========================================");
@@ -26,12 +35,10 @@ const connectDB = async () => {
       console.log("🟠 MongoDB Disconnected");
     });
 
-    mongoose.connection.on("error", (err) => {
-      console.error("🔴 MongoDB Error:", err.message);
+    mongoose.connection.on("error", (error) => {
+      console.error("🔴 MongoDB Error:", error.message);
     });
-
   } catch (error) {
-
     console.error("\n========================================");
     console.error("❌ MongoDB Connection Failed");
     console.error(error.message);

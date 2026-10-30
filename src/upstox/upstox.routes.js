@@ -7,7 +7,7 @@ const express = require("express");
 const upstoxController = require("./upstox.controller");
 const upstoxMarketController = require(
   "./upstox.market.controller"
-);
+);     
 
 // ==========================================================
 // Router
@@ -80,6 +80,11 @@ router.get(
     );
   }
 );
+
+
+router.get("/market-history", (req, res) => {
+  return upstoxMarketController.getHistoricalCandles(req, res);
+});
 
 // ==========================================================
 // Export

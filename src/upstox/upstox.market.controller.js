@@ -14,6 +14,7 @@ const marketService =
 // ==========================================================
 
 const parseInstrumentKeys = (value) => {
+
   if (
     value === undefined ||
     value === null ||
@@ -85,6 +86,32 @@ const getMarketData = async (req, res) => {
   }
 };
 
+const getHistoricalCandles = async (req, res) => {
+  try {
+    const result = await marketService.getHistoricalCandles(
+      req.query.range || "1D",
+    );
+
+    return res.status(200).json(result);
+  } catch (error) {
+    const statusCode =
+      Number.isInteger(error.statusCode) &&
+      error.statusCode >= 400 &&
+      error.statusCode < 600
+        ? error.statusCode
+        : 500;
+
+    console.error("[Upstox Historical Controller]", error.message);
+
+    return res.status(statusCode).json({
+      success: false,
+      code: error.code || "UPSTOX_HISTORICAL_DATA_ERROR",
+      message: error.message || "Unable to load historical data.",
+    });
+  }
+};
+
 module.exports = {
   getMarketData,
+  getHistoricalCandles,
 };
